@@ -1,21 +1,35 @@
-resource "kubernetes_ingress" "gits" {
+
+
+resource "kubernetes_ingress_v1" "gits" {
   metadata {
     name      = "gits"
     namespace = kubernetes_namespace.gits.metadata[0].name
+    annotations = {
+      "kubernetes.io/ingress.class" = "nginx"
+    }
+
   }
 
   spec {
-    backend {
-      service_name = "gits-frontend"
-      service_port = 3000
+    default_backend {
+      service {
+        name = "gits-frontend"
+        port {
+          number = 3000
+        }
+      }
     }
 
     rule {
       http {
         path {
           backend {
-            service_name = "gits-frontend"
-            service_port = 3000
+            service {
+              name = "gits-frontend"
+              port {
+                number = 3000
+              }
+            }
           }
 
           path = "/"

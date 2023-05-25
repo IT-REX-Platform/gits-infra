@@ -1,8 +1,8 @@
-resource "kubernetes_deployment" "gits_frontend" {
+resource "kubernetes_deployment" "gits_content_service" {
   metadata {
-    name = "gits-frontend"
+    name = "gits-content-service"
     labels = {
-      app = "gits-frontend"
+      app = "gits-content-service"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
   }
@@ -12,25 +12,35 @@ resource "kubernetes_deployment" "gits_frontend" {
 
     selector {
       match_labels = {
-        app = "gits-frontend"
+        app = "gits-content-service"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "gits-frontend"
+          app = "gits-content-service"
+
         }
+        annotations = {
+          "dapr.io/app-id"   = "content-service"
+          "dapr.io/app-port" = 4000
+        }
+
       }
 
       spec {
+
         image_pull_secrets {
           name = "github-pull-secret"
         }
 
+
         container {
-          image = "ghcr.io/it-rex-platform/gits-fronted:e01eb5e2"
-          name  = "gits-frontend"
+          image = "ghcr.io/it-rex-platform/gits-content_service:0bb8a427"
+          name  = "gits-content-service"
+
+
 
           resources {
             limits = {
@@ -46,7 +56,7 @@ resource "kubernetes_deployment" "gits_frontend" {
           liveness_probe {
             http_get {
               path = "/"
-              port = 3000
+              port = 4000
 
             }
 
@@ -59,21 +69,9 @@ resource "kubernetes_deployment" "gits_frontend" {
   }
 }
 
-resource "kubernetes_service" "gits_frontend" {
-  metadata {
-    name = "gits-frontend"
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.gits_frontend.metadata[0].labels.app
-    }
-
-    port {
-      port        = 3000
-      target_port = 3000
-    }
-
-    type = "NodePort"
-  }
+resource "helm_release" "content_service_db" {
+  name       = "content-service-db"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "postgresql"
+  namespace  = kubernetes_namespace.gits.metadata[0].name
 }
-

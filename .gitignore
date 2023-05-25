@@ -2,3 +2,4 @@
 kubeconfig.yaml
 terraform.tfstate*
 _old
+terraform.tfvars
