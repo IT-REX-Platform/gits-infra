@@ -37,10 +37,8 @@ resource "kubernetes_deployment" "gits_content_service" {
 
 
         container {
-          image = "ghcr.io/it-rex-platform/gits-content_service:0bb8a427"
+          image = "ghcr.io/it-rex-platform/content_service:latest"
           name  = "gits-content-service"
-
-
 
           resources {
             limits = {
@@ -51,6 +49,21 @@ resource "kubernetes_deployment" "gits_content_service" {
               cpu    = "50m"
               memory = "50Mi"
             }
+          }
+
+          env {
+            name  = "SPRING_DATASOURCE_URL"
+            value = "jdbc:postgresql://content-service-db:5432/content-service"
+          }
+
+          env {
+            name  = "SPRING_DATASOURCE_USERNAME"
+            value = "gits"
+          }
+
+          env {
+            name  = "SPRING_DATASOURCE_PASSWORD"
+            value = random_password.content_service_db_pass.result
           }
 
           liveness_probe {
@@ -69,9 +82,34 @@ resource "kubernetes_deployment" "gits_content_service" {
   }
 }
 
+resource "random_password" "content_service_db_pass" {
+  length  = 32
+  special = false
+}
+
 resource "helm_release" "content_service_db" {
   name       = "content-service-db"
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql"
   namespace  = kubernetes_namespace.gits.metadata[0].name
+
+  set {
+    name  = "auth.database"
+    value = "content-service"
+  }
+
+  set {
+    name  = "auth.enablePostgresUser"
+    value = "false"
+  }
+
+  set {
+    name  = "auth.username"
+    value = "gits"
+  }
+
+  set {
+    name  = "auth.password"
+    value = random_password.content_service_db_pass.result
+  }
 }
