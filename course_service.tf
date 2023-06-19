@@ -1,8 +1,8 @@
-resource "kubernetes_deployment" "gits_content_service" {
+resource "kubernetes_deployment" "gits_course_service" {
   metadata {
-    name = "gits-content-service"
+    name = "gits-course-service"
     labels = {
-      app = "gits-content-service"
+      app = "gits-course-service"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
   }
@@ -12,18 +12,18 @@ resource "kubernetes_deployment" "gits_content_service" {
 
     selector {
       match_labels = {
-        app = "gits-content-service"
+        app = "gits-course-service"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "gits-content-service"
+          app = "gits-course-service"
 
         }
         annotations = {
-          "dapr.io/app-id"   = "content-service"
+          "dapr.io/app-id"   = "course-service"
           "dapr.io/app-port" = 4000
         }
 
@@ -37,8 +37,8 @@ resource "kubernetes_deployment" "gits_content_service" {
 
 
         container {
-          image = "ghcr.io/it-rex-platform/content_service:latest"
-          name  = "gits-content-service"
+          image = "ghcr.io/it-rex-platform/course_service:latest"
+          name  = "gits-course-service"
 
           resources {
             limits = {
@@ -53,7 +53,7 @@ resource "kubernetes_deployment" "gits_content_service" {
 
           env {
             name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:postgresql://content-service-db-postgresql:5432/content-service"
+            value = "jdbc:postgresql://course-service-db-postgresql:5432/course-service"
           }
 
           env {
@@ -63,7 +63,7 @@ resource "kubernetes_deployment" "gits_content_service" {
 
           env {
             name  = "SPRING_DATASOURCE_PASSWORD"
-            value = random_password.content_service_db_pass.result
+            value = random_password.course_service_db_pass.result
           }
 
           liveness_probe {
@@ -82,20 +82,20 @@ resource "kubernetes_deployment" "gits_content_service" {
   }
 }
 
-resource "random_password" "content_service_db_pass" {
+resource "random_password" "course_service_db_pass" {
   length  = 32
   special = false
 }
 
-resource "helm_release" "content_service_db" {
-  name       = "content-service-db"
+resource "helm_release" "course_service_db" {
+  name       = "course-service-db"
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql"
   namespace  = kubernetes_namespace.gits.metadata[0].name
 
   set {
     name  = "postgresql.auth.database"
-    value = "content-service"
+    value = "course-service"
   }
 
   set {
@@ -110,6 +110,6 @@ resource "helm_release" "content_service_db" {
 
   set {
     name  = "postgresql.auth.password"
-    value = random_password.content_service_db_pass.result
+    value = random_password.course_service_db_pass.result
   }
 }
