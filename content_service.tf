@@ -53,7 +53,7 @@ resource "kubernetes_deployment" "gits_content_service" {
 
           env {
             name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:postgresql://content-service-db:5432/content-service"
+            value = "jdbc:postgresql://content-service-db-postgresql:5432/content-service"
           }
 
           env {
