@@ -30,6 +30,10 @@ resource "helm_release" "keycloak" {
     value = kubernetes_secret.image_pull.metadata[0].name
   }
   set {
+    name  = "image.pullPolicy"
+    value = "Always"
+  }
+  set {
     name  = "image.registry"
     value = "ghcr.io"
   }
