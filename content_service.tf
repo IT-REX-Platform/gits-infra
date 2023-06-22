@@ -1,10 +1,20 @@
 resource "kubernetes_deployment" "gits_content_service" {
+  depends_on = [helm_release.content_service_db, helm_release.dapr, helm_release.keel, kubernetes_secret.image_pull]
   metadata {
+
     name = "gits-content-service"
     labels = {
       app = "gits-content-service"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
+    annotations = {
+      "dapr.io/enabled"   = true
+      "dapr.io/app-id"    = "content-service"
+      "dapr.io/app-port"  = 4000
+      "keel.sh/policy"    = "force"
+      "keel.sh/match-tag" = "true"
+      "keel.sh/trigger"   = "poll"
+    }
   }
 
   spec {
@@ -22,23 +32,20 @@ resource "kubernetes_deployment" "gits_content_service" {
           app = "gits-content-service"
 
         }
-        annotations = {
-          "dapr.io/app-id"   = "content-service"
-          "dapr.io/app-port" = 4000
-        }
-
       }
 
       spec {
 
         image_pull_secrets {
-          name = "github-pull-secret"
+          name = kubernetes_secret.image_pull.metadata[0].name
         }
 
 
         container {
-          image = "ghcr.io/it-rex-platform/content_service:latest"
-          name  = "gits-content-service"
+          image             = "ghcr.io/it-rex-platform/content_service:latest"
+          image_pull_policy = "Always"
+
+          name = "gits-content-service"
 
           resources {
             limits = {
@@ -66,16 +73,27 @@ resource "kubernetes_deployment" "gits_content_service" {
             value = random_password.content_service_db_pass.result
           }
 
-          liveness_probe {
-            http_get {
-              path = "/"
-              port = 4000
+          # liveness_probe {
+          #   http_get {
+          #     path = "/graphql"
+          #     port = 4001
 
-            }
+          #   }
 
-            initial_delay_seconds = 9
-            period_seconds        = 9
-          }
+          #   initial_delay_seconds = 30
+          #   period_seconds        = 9
+          # }
+
+          # readiness_probe {
+          #   http_get {
+          #     path = "/graphql"
+          #     port = 4001
+
+          #   }
+
+          #   initial_delay_seconds = 30
+          #   period_seconds        = 9
+          # }
         }
       }
     }
@@ -94,22 +112,41 @@ resource "helm_release" "content_service_db" {
   namespace  = kubernetes_namespace.gits.metadata[0].name
 
   set {
-    name  = "postgresql.auth.database"
+    name  = "global.postgresql.auth.database"
     value = "content-service"
   }
 
   set {
-    name  = "postgresql.auth.enablePostgresUser"
+    name  = "postgres.auth.enablePostgresUser"
     value = "false"
   }
 
   set {
-    name  = "postgresql.auth.username"
+    name  = "global.postgresql.auth.username"
     value = "gits"
   }
 
   set {
-    name  = "postgresql.auth.password"
+    name  = "global.postgresql.auth.password"
     value = random_password.content_service_db_pass.result
+  }
+}
+
+resource "kubernetes_service" "gits_content_service" {
+  metadata {
+    name      = "gits-content-service"
+    namespace = kubernetes_namespace.gits.metadata[0].name
+  }
+  spec {
+    selector = {
+      app = kubernetes_deployment.gits_content_service.metadata[0].labels.app
+    }
+
+    port {
+      port        = 80
+      target_port = 4001
+    }
+
+    type = "NodePort"
   }
 }

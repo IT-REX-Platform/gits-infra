@@ -5,6 +5,12 @@ resource "kubernetes_deployment" "gits_frontend" {
       app = "gits-frontend"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
+
+    annotations = {
+      "keel.sh/policy"    = "force"
+      "keel.sh/match-tag" = "true"
+      "keel.sh/trigger"   = "poll"
+    }
   }
 
   spec {
@@ -25,12 +31,14 @@ resource "kubernetes_deployment" "gits_frontend" {
 
       spec {
         image_pull_secrets {
-          name = "github-pull-secret"
+          name = kubernetes_secret.image_pull.metadata[0].name
         }
 
         container {
-          image = "ghcr.io/it-rex-platform/gits-fronted:e01eb5e2"
-          name  = "gits-frontend"
+          image             = "ghcr.io/it-rex-platform/frontend:latest"
+          image_pull_policy = "Always"
+
+          name = "gits-frontend"
 
           resources {
             limits = {
@@ -41,6 +49,23 @@ resource "kubernetes_deployment" "gits_frontend" {
               cpu    = "50m"
               memory = "50Mi"
             }
+          }
+
+          env {
+            name  = "NEXT_PUBLIC_BACKEND_URL"
+            value = "/api"
+          }
+          env {
+            name  = "NEXT_PUBLIC_OAUTH_REDIRECT_URL"
+            value = "http://orange.informatik.uni-stuttgart.de"
+          }
+          env {
+            name  = "NEXT_PUBLIC_OAUTH_CLIENT_ID"
+            value = "gits-frontend"
+          }
+          env {
+            name  = "NEXT_PUBLIC_OAUTH_AUTHORITY"
+            value = "http://orange.informatik.uni-stuttgart.de/keycloak/realms/GITS"
           }
 
           liveness_probe {
@@ -61,7 +86,8 @@ resource "kubernetes_deployment" "gits_frontend" {
 
 resource "kubernetes_service" "gits_frontend" {
   metadata {
-    name = "gits-frontend"
+    name      = "gits-frontend"
+    namespace = kubernetes_namespace.gits.metadata[0].name
   }
   spec {
     selector = {
@@ -69,7 +95,7 @@ resource "kubernetes_service" "gits_frontend" {
     }
 
     port {
-      port        = 3000
+      port        = 80
       target_port = 3000
     }
 
