@@ -7,9 +7,6 @@ resource "kubernetes_deployment" "gits_media_service" {
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
     annotations = {
-      "dapr.io/enabled"   = true
-      "dapr.io/app-id"    = "media-service"
-      "dapr.io/app-port"  = 3000
       "keel.sh/policy"    = "force"
       "keel.sh/match-tag" = "true"
       "keel.sh/trigger"   = "poll"
@@ -29,7 +26,11 @@ resource "kubernetes_deployment" "gits_media_service" {
       metadata {
         labels = {
           app = "gits-media-service"
-
+        }
+        annotations = {
+          "dapr.io/enabled"  = false
+          "dapr.io/app-id"   = "media-service"
+          "dapr.io/app-port" = 3000
         }
       }
 
@@ -150,24 +151,6 @@ resource "random_password" "media_service_minio_pass" {
   special = false
 }
 
-
-resource "helm_release" "minio" {
-  name       = "minio"
-  repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "minio"
-  namespace  = kubernetes_namespace.gits.metadata[0].name
-
-  set {
-    name  = "auth.rootUser"
-    value = "gits"
-  }
-
-  set {
-    name  = "auth.rootPassword"
-    value = random_password.media_service_minio_pass.result
-  }
-}
-
 resource "kubernetes_service" "gits_media_service" {
   metadata {
     name      = "gits-media-service"
@@ -184,5 +167,30 @@ resource "kubernetes_service" "gits_media_service" {
     }
 
     type = "NodePort"
+  }
+}
+
+resource "helm_release" "minio" {
+  name       = "minio"
+  repository = "oci://registry-1.docker.io/bitnamicharts"
+  chart      = "minio"
+  namespace  = kubernetes_namespace.gits.metadata[0].name
+
+  set {
+    name  = "auth.rootUser"
+    value = "gits"
+  }
+
+  set {
+    name  = "auth.rootPassword"
+    value = random_password.media_service_minio_pass.result
+  }
+  set {
+    name  = "extraEnvVars[0].name"
+    value = "MINIO_BROWSER_REDIRECT_URL"
+  }
+  set {
+    name  = "extraEnvVars[0].value"
+    value = "https://orange.informatik.uni-stuttgart.de/minio"
   }
 }

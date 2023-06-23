@@ -7,9 +7,6 @@ resource "kubernetes_deployment" "gits_course_service" {
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
     annotations = {
-      "dapr.io/enabled"   = true
-      "dapr.io/app-id"    = "course-service"
-      "dapr.io/app-port"  = 2000
       "keel.sh/policy"    = "force"
       "keel.sh/match-tag" = "true"
       "keel.sh/trigger"   = "poll"
@@ -29,9 +26,12 @@ resource "kubernetes_deployment" "gits_course_service" {
       metadata {
         labels = {
           app = "gits-course-service"
-
         }
-
+        annotations = {
+          "dapr.io/enabled"  = false
+          "dapr.io/app-id"   = "media-service"
+          "dapr.io/app-port" = 3000
+        }
       }
 
       spec {

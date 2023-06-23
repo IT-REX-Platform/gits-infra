@@ -74,6 +74,7 @@ resource "kubernetes_ingress_v1" "gits" {
         }
       }
     }
+
     tls {
       secret_name = "orange-tls-cert"
       hosts       = ["orange.informatik.uni-stuttgart.de"]
