@@ -26,8 +26,14 @@ resource "kubernetes_deployment" "gits_graphql_gateway" {
       metadata {
         labels = {
           app = "gits-gateway"
-
         }
+
+        annotations = {
+          "dapr.io/enabled"  = true
+          "dapr.io/app-id"   = "gateway"
+          "dapr.io/app-port" = 8080
+        }
+
       }
 
       spec {
@@ -64,15 +70,23 @@ resource "kubernetes_deployment" "gits_graphql_gateway" {
           }
           env {
             name  = "COURSE_SERVICE_URL"
-            value = "http://gits-course-service/graphql"
+            value = "http://localhost:3500/v1.0/invoke/course-service/method/graphql"
           }
           env {
             name  = "MEDIA_SERVICE_URL"
-            value = "http://gits-media-service/graphql"
+            value = "http://localhost:3500/v1.0/invoke/media-service/method/graphql"
           }
           env {
             name  = "CONTENT_SERVICE_URL"
-            value = "http://gits-content-service/graphql"
+            value = "http://localhost:3500/v1.0/invoke/content-service/method/graphql"
+          }
+          env {
+            name  = "FLASHCARD_SERVICE_URL"
+            value = "http://localhost:3500/v1.0/invoke/flashcard-service/method/graphql"
+          }
+          env {
+            name  = "REWARD_SERVICE_URL"
+            value = "http://localhost:5000/v1.0/invoke/reward-service/graphql"
           }
           env {
             name  = "JWKS_URL"

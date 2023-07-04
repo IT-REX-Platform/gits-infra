@@ -28,9 +28,10 @@ resource "kubernetes_deployment" "gits_flashcard_service" {
           app = "gits-flashcard-service"
         }
         annotations = {
-          "dapr.io/enabled"  = false
-          "dapr.io/app-id"   = "media-service"
-          "dapr.io/app-port" = 3000
+          "dapr.io/enabled"   = true
+          "dapr.io/app-id"    = "flashcard-service"
+          "dapr.io/app-port"  = 6001
+          "dapr.io/http-port" = 6000
         }
       }
 
@@ -129,24 +130,5 @@ resource "helm_release" "flashcard_service_db" {
   set {
     name  = "global.postgresql.auth.password"
     value = random_password.flashcard_service_db_pass.result
-  }
-}
-
-resource "kubernetes_service" "gits_flashcard_service" {
-  metadata {
-    name      = "gits-flashcard-service"
-    namespace = kubernetes_namespace.gits.metadata[0].name
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.gits_flashcard_service.metadata[0].labels.app
-    }
-
-    port {
-      port        = 80
-      target_port = 3001
-    }
-
-    type = "NodePort"
   }
 }

@@ -28,9 +28,10 @@ resource "kubernetes_deployment" "gits_media_service" {
           app = "gits-media-service"
         }
         annotations = {
-          "dapr.io/enabled"  = false
-          "dapr.io/app-id"   = "media-service"
-          "dapr.io/app-port" = 3000
+          "dapr.io/enabled"   = true
+          "dapr.io/app-id"    = "media-service"
+          "dapr.io/app-port"  = 3001
+          "dapr.io/http-port" = 3000
         }
       }
 
@@ -149,25 +150,6 @@ resource "helm_release" "media_service_db" {
 resource "random_password" "media_service_minio_pass" {
   length  = 32
   special = false
-}
-
-resource "kubernetes_service" "gits_media_service" {
-  metadata {
-    name      = "gits-media-service"
-    namespace = kubernetes_namespace.gits.metadata[0].name
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.gits_media_service.metadata[0].labels.app
-    }
-
-    port {
-      port        = 80
-      target_port = 3001
-    }
-
-    type = "NodePort"
-  }
 }
 
 resource "helm_release" "minio" {

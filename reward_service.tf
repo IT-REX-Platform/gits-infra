@@ -1,9 +1,9 @@
-resource "kubernetes_deployment" "gits_course_service" {
-  depends_on = [helm_release.course_service_db, helm_release.dapr, helm_release.keel, kubernetes_secret.image_pull]
+resource "kubernetes_deployment" "gits_reward_service" {
+  depends_on = [helm_release.reward_service_db, helm_release.dapr, helm_release.keel, kubernetes_secret.image_pull]
   metadata {
-    name = "gits-course-service"
+    name = "gits-reward-service"
     labels = {
-      app = "gits-course-service"
+      app = "gits-reward-service"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
     annotations = {
@@ -18,20 +18,20 @@ resource "kubernetes_deployment" "gits_course_service" {
 
     selector {
       match_labels = {
-        app = "gits-course-service"
+        app = "gits-reward-service"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "gits-course-service"
+          app = "gits-reward-service"
         }
         annotations = {
           "dapr.io/enabled"   = true
-          "dapr.io/app-id"    = "course-service"
-          "dapr.io/app-port"  = 2001
-          "dapr.io/http-port" = 2000
+          "dapr.io/app-id"    = "reward-service"
+          "dapr.io/app-port"  = 7001
+          "dapr.io/http-port" = 7000
         }
       }
 
@@ -43,10 +43,10 @@ resource "kubernetes_deployment" "gits_course_service" {
 
 
         container {
-          image             = "ghcr.io/it-rex-platform/course_service:latest"
+          image             = "ghcr.io/it-rex-platform/reward_service:latest"
           image_pull_policy = "Always"
 
-          name = "gits-course-service"
+          name = "gits-reward-service"
 
           resources {
             limits = {
@@ -61,7 +61,7 @@ resource "kubernetes_deployment" "gits_course_service" {
 
           env {
             name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:postgresql://course-service-db-postgresql:5432/course-service"
+            value = "jdbc:postgresql://reward-service-db-postgresql:5432/reward-service"
           }
 
           env {
@@ -71,13 +71,13 @@ resource "kubernetes_deployment" "gits_course_service" {
 
           env {
             name  = "SPRING_DATASOURCE_PASSWORD"
-            value = random_password.course_service_db_pass.result
+            value = random_password.reward_service_db_pass.result
           }
 
           # liveness_probe {
           #   http_get {
           #     path = "/graphql"
-          #     port = 2001
+          #     port = 7001
 
           #   }
 
@@ -88,7 +88,7 @@ resource "kubernetes_deployment" "gits_course_service" {
           # readiness_probe {
           #   http_get {
           #     path = "/graphql"
-          #     port = 2001
+          #     port = 7001
 
           #   }
 
@@ -101,20 +101,20 @@ resource "kubernetes_deployment" "gits_course_service" {
   }
 }
 
-resource "random_password" "course_service_db_pass" {
+resource "random_password" "reward_service_db_pass" {
   length  = 32
   special = false
 }
 
-resource "helm_release" "course_service_db" {
-  name       = "course-service-db"
+resource "helm_release" "reward_service_db" {
+  name       = "reward-service-db"
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql"
   namespace  = kubernetes_namespace.gits.metadata[0].name
 
   set {
     name  = "global.postgresql.auth.database"
-    value = "course-service"
+    value = "reward-service"
   }
 
   set {
@@ -129,6 +129,8 @@ resource "helm_release" "course_service_db" {
 
   set {
     name  = "global.postgresql.auth.password"
-    value = random_password.course_service_db_pass.result
+    value = random_password.reward_service_db_pass.result
   }
 }
+
+

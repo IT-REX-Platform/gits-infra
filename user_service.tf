@@ -28,9 +28,10 @@ resource "kubernetes_deployment" "gits_user_service" {
           app = "gits-user-service"
         }
         annotations = {
-          "dapr.io/enabled"  = false
-          "dapr.io/app-id"   = "media-service"
-          "dapr.io/app-port" = 3000
+          "dapr.io/enabled"   = true
+          "dapr.io/app-id"    = "user-service"
+          "dapr.io/app-port"  = 5001
+          "dapr.io/http-port" = 5000
         }
       }
 
@@ -76,7 +77,7 @@ resource "kubernetes_deployment" "gits_user_service" {
           # liveness_probe {
           #   http_get {
           #     path = "/graphql"
-          #     port = 4001
+          #     port = 5001
 
           #   }
 
@@ -87,7 +88,7 @@ resource "kubernetes_deployment" "gits_user_service" {
           # readiness_probe {
           #   http_get {
           #     path = "/graphql"
-          #     port = 4001
+          #     port = 5001
 
           #   }
 
@@ -131,23 +132,3 @@ resource "helm_release" "user_service_db" {
     value = random_password.user_service_db_pass.result
   }
 }
-
-resource "kubernetes_service" "gits_user_service" {
-  metadata {
-    name      = "gits-user-service"
-    namespace = kubernetes_namespace.gits.metadata[0].name
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.gits_user_service.metadata[0].labels.app
-    }
-
-    port {
-      port        = 80
-      target_port = 4000
-    }
-
-    type = "NodePort"
-  }
-}
-
