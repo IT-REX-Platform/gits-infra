@@ -1,9 +1,9 @@
 resource "kubernetes_deployment" "gits_skill_level_service" {
   depends_on = [helm_release.skill_level_service_db, helm_release.dapr, helm_release.keel, kubernetes_secret.image_pull]
   metadata {
-    name = "gits-skill_level-service"
+    name = "gits-skill-level-service"
     labels = {
-      app = "gits-skill_level-service"
+      app = "gits-skill-level-service"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
     annotations = {
@@ -18,14 +18,14 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
 
     selector {
       match_labels = {
-        app = "gits-skill_level-service"
+        app = "gits-skill-level-service"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "gits-skill_level-service"
+          app = "gits-skill-level-service"
         }
         annotations = {
           "dapr.io/enabled"   = true
@@ -46,7 +46,7 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
           image             = "ghcr.io/it-rex-platform/skill_level_service:latest"
           image_pull_policy = "Always"
 
-          name = "gits-skill_level-service"
+          name = "gits-skill-level-service"
 
           resources {
             limits = {
