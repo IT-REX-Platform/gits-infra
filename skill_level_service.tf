@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
         }
         annotations = {
           "dapr.io/enabled"   = true
-          "dapr.io/app-id"    = "skill_level-service"
+          "dapr.io/app-id"    = "skill-level-service"
           "dapr.io/app-port"  = 9001
           "dapr.io/http-port" = 9000
         }
@@ -61,7 +61,7 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
 
           env {
             name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:postgresql://skill_level-service-db-postgresql:5432/skill_level-service"
+            value = "jdbc:postgresql://skill-level-service-db-postgresql:5432/skill-level-service"
           }
 
           env {
@@ -118,14 +118,14 @@ resource "random_password" "skill_level_service_db_pass" {
 }
 
 resource "helm_release" "skill_level_service_db" {
-  name       = "skill_level-service-db"
+  name       = "skill-level-service-db"
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql"
   namespace  = kubernetes_namespace.gits.metadata[0].name
 
   set {
     name  = "global.postgresql.auth.database"
-    value = "skill_level-service"
+    value = "skill-level-service"
   }
 
   set {
