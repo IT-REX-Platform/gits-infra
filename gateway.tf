@@ -81,12 +81,20 @@ resource "kubernetes_deployment" "gits_graphql_gateway" {
             value = "http://localhost:3500/v1.0/invoke/content-service/method/graphql"
           }
           env {
+            name  = "USER_SERVICE_URL"
+            value = "http://localhost:3500/v1.0/invoke/user-service/method/graphql"
+          }
+          env {
             name  = "FLASHCARD_SERVICE_URL"
             value = "http://localhost:3500/v1.0/invoke/flashcard-service/method/graphql"
           }
           env {
             name  = "REWARD_SERVICE_URL"
-            value = "http://localhost:5000/v1.0/invoke/reward-service/graphql"
+            value = "http://localhost:3500/v1.0/invoke/reward-service/method/graphql"
+          }
+          env {
+            name  = "QUIZ_SERVICE_URL"
+            value = "http://localhost:3500/v1.0/invoke/quiz-service/method/graphql"
           }
           env {
             name  = "JWKS_URL"

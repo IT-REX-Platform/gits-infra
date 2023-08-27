@@ -75,6 +75,45 @@ resource "kubernetes_ingress_v1" "gits" {
       }
     }
 
+    rule {
+      host = "minio.it-rex.ch"
+
+      http {
+
+
+        path {
+          backend {
+            service {
+              name = "minio"
+              port {
+                number = 9000
+              }
+            }
+          }
+
+          path = "/"
+        }
+      }
+    }
+    rule {
+      host = "minio-dashboard.it-rex.ch"
+
+      http {
+        path {
+          backend {
+            service {
+              name = "minio"
+              port {
+                number = 9001
+              }
+            }
+          }
+
+          path = "/"
+        }
+      }
+    }
+
     tls {
       secret_name = "orange-tls-cert"
       hosts       = ["orange.informatik.uni-stuttgart.de"]
@@ -82,3 +121,4 @@ resource "kubernetes_ingress_v1" "gits" {
 
   }
 }
+

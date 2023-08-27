@@ -76,7 +76,7 @@ resource "kubernetes_deployment" "gits_media_service" {
 
           env {
             name  = "MINIO_URL"
-            value = "minio"
+            value = "http://minio:9000"
           }
           env {
             name  = "MINIO_ACCESS_KEY"
@@ -170,9 +170,5 @@ resource "helm_release" "minio" {
   set {
     name  = "extraEnvVars[0].name"
     value = "MINIO_BROWSER_REDIRECT_URL"
-  }
-  set {
-    name  = "extraEnvVars[0].value"
-    value = "https://orange.informatik.uni-stuttgart.de/minio"
   }
 }
