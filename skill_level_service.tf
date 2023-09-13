@@ -1,9 +1,9 @@
-resource "kubernetes_deployment" "gits_skill_level_service" {
-  depends_on = [helm_release.skill_level_service_db, helm_release.dapr, helm_release.keel, kubernetes_secret.image_pull]
+resource "kubernetes_deployment" "gits_skilllevel_service" {
+  depends_on = [helm_release.skilllevel_service_db, helm_release.dapr, helm_release.keel, kubernetes_secret.image_pull]
   metadata {
-    name = "gits-skill-level-service"
+    name = "gits-skilllevel-service"
     labels = {
-      app = "gits-skill-level-service"
+      app = "gits-skilllevel-service"
     }
     namespace = kubernetes_namespace.gits.metadata[0].name
     annotations = {
@@ -18,20 +18,20 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
 
     selector {
       match_labels = {
-        app = "gits-skill-level-service"
+        app = "gits-skilllevel-service"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "gits-skill-level-service"
+          app = "gits-skilllevel-service"
         }
         annotations = {
           "dapr.io/enabled"   = true
-          "dapr.io/app-id"    = "skill-level-service"
-          "dapr.io/app-port"  = 9001
-          "dapr.io/http-port" = 9000
+          "dapr.io/app-id"    = "skilllevel-service"
+          "dapr.io/app-port"  = 8001
+          "dapr.io/http-port" = 8000
         }
       }
 
@@ -43,10 +43,10 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
 
 
         container {
-          image             = "ghcr.io/it-rex-platform/skill_level_service:latest"
+          image             = "ghcr.io/it-rex-platform/skilllevel_service:latest"
           image_pull_policy = "Always"
 
-          name = "gits-skill-level-service"
+          name = "gits-skilllevel-service"
 
           resources {
             limits = {
@@ -61,7 +61,7 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
 
           env {
             name  = "SPRING_DATASOURCE_URL"
-            value = "jdbc:postgresql://skill-level-service-db-postgresql:5432/skill-level-service"
+            value = "jdbc:postgresql://skilllevel-service-db-postgresql:5432/skilllevel-service"
           }
 
           env {
@@ -71,7 +71,7 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
 
           env {
             name  = "SPRING_DATASOURCE_PASSWORD"
-            value = random_password.skill_level_service_db_pass.result
+            value = random_password.skilllevel_service_db_pass.result
           }
 
           env {
@@ -112,20 +112,20 @@ resource "kubernetes_deployment" "gits_skill_level_service" {
   }
 }
 
-resource "random_password" "skill_level_service_db_pass" {
+resource "random_password" "skilllevel_service_db_pass" {
   length  = 32
   special = false
 }
 
-resource "helm_release" "skill_level_service_db" {
-  name       = "skill-level-service-db"
+resource "helm_release" "skilllevel_service_db" {
+  name       = "skilllevel-service-db"
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql"
   namespace  = kubernetes_namespace.gits.metadata[0].name
 
   set {
     name  = "global.postgresql.auth.database"
-    value = "skill-level-service"
+    value = "skilllevel-service"
   }
 
   set {
@@ -140,7 +140,7 @@ resource "helm_release" "skill_level_service_db" {
 
   set {
     name  = "global.postgresql.auth.password"
-    value = random_password.skill_level_service_db_pass.result
+    value = random_password.skilllevel_service_db_pass.result
   }
 }
 
