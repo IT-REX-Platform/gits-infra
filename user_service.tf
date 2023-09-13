@@ -54,12 +54,8 @@ resource "kubernetes_deployment" "gits_user_service" {
           name = "gits-user-service"
 
           resources {
-            limits = {
-              cpu    = "500m"
-              memory = "1Gi"
-            }
             requests = {
-              cpu    = "300m"
+              cpu    = "100m"
               memory = "500Mi"
             }
           }
@@ -168,7 +164,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_user_service_hpa" {
         name = "cpu"
         target {
           type = "Utilization"
-          average_utilization = 70
+          average_utilization = 300
         }
       }
     }
