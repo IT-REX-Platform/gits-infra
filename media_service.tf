@@ -179,7 +179,8 @@ resource "helm_release" "minio" {
 
 resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_media_service_hpa" {
   metadata {
-    name = "gits_media_service_hpa"
+    name = "gits-media-service-hpa"
+    namespace = kubernetes_namespace.gits.metadata[0].name
   }
 
   spec {

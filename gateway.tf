@@ -154,7 +154,8 @@ resource "kubernetes_service" "gits_graphql_gateway" {
 
 resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_graphql_gateway_hpa" {
   metadata {
-    name = "gits_graphql_gateway_hpa"
+    name = "gits-graphql-gateway-hpa"
+    namespace = kubernetes_namespace.gits.metadata[0].name
   }
 
   spec {
