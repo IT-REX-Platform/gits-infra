@@ -179,7 +179,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_graphql_gateway_hpa" {
         name = "cpu"
         target {
           type = "Utilization"
-          average_utilization = 50
+          average_utilization = 70
         }
       }
     }
