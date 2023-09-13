@@ -32,6 +32,10 @@ resource "kubernetes_deployment" "gits_graphql_gateway" {
           "dapr.io/enabled"  = true
           "dapr.io/app-id"   = "gateway"
           "dapr.io/app-port" = 8080
+          "dapr.io/sidecar-cpu-request" = "100m"
+          "dapr.io/sidecar-cpu-limit"   = "200m"
+          "dapr.io/sidecar-memory-request" = "100Mi"
+          "dapr.io/sidecar-memory-limit"   = "200Mi"
         }
 
       }
@@ -51,12 +55,12 @@ resource "kubernetes_deployment" "gits_graphql_gateway" {
 
           resources {
             limits = {
-              cpu    = "0.5"
-              memory = "512Mi"
+              cpu    = "500m"
+              memory = "1Gi"
             }
             requests = {
-              cpu    = "50m"
-              memory = "50Mi"
+              cpu    = "300m"
+              memory = "500Mi"
             }
           }
 
@@ -150,4 +154,31 @@ resource "kubernetes_service" "gits_graphql_gateway" {
 
     type = "NodePort"
   }
+}
+
+resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_graphql_gateway_hpa" {
+  metadata {
+    name = "gits_graphql_gateway_hpa"
+  }
+
+  spec {
+    min_replicas = 1
+    max_replicas = 10
+
+    scale_target_ref {
+      kind = "Deployment"
+      name = "gits_graphql_gateway"
+    }
+
+    metric {
+      type = "Resource"
+      resource {
+        name = "cpu"
+        target {
+          type = "Utilization"
+          average_utilization = 50
+        }
+      }
+    }
+  }  
 }
