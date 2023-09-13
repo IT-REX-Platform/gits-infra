@@ -32,6 +32,11 @@ resource "kubernetes_deployment" "gits_user_service" {
           "dapr.io/app-id"    = "user-service"
           "dapr.io/app-port"  = 5001
           "dapr.io/http-port" = 5000
+          "dapr.io/sidecar-cpu-request" = "100m"
+          "dapr.io/sidecar-cpu-limit"   = "200m"
+          "dapr.io/sidecar-memory-request" = "150Mi"
+          "dapr.io/sidecar-memory-limit"   = "250Mi"
+          "dapr.io/env" = "GOMEMLIMIT=220MiB"
         }
       }
 
@@ -50,12 +55,12 @@ resource "kubernetes_deployment" "gits_user_service" {
 
           resources {
             limits = {
-              cpu    = "0.5"
-              memory = "512Mi"
+              cpu    = "500m"
+              memory = "1Gi"
             }
             requests = {
-              cpu    = "50m"
-              memory = "50Mi"
+              cpu    = "300m"
+              memory = "500Mi"
             }
           }
 
@@ -139,4 +144,33 @@ resource "helm_release" "user_service_db" {
     name  = "global.postgresql.auth.password"
     value = random_password.user_service_db_pass.result
   }
+}
+
+resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_user_service_hpa" {
+  metadata {
+    name = kubernetes_deployment.gits_graphql_gateway.metadata[0].name
+    namespace = kubernetes_namespace.gits.metadata[0].name
+  }
+
+  spec {
+    min_replicas = 1
+    max_replicas = 10
+
+    scale_target_ref {
+      api_version = "apps/v1"
+      kind = "Deployment"
+      name = kubernetes_deployment.gits_graphql_gateway.metadata[0].name
+    }
+
+    metric {
+      type = "Resource"
+      resource {
+        name = "cpu"
+        target {
+          type = "Utilization"
+          average_utilization = 50
+        }
+      }
+    }
+  }  
 }

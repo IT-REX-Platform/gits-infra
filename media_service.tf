@@ -34,8 +34,9 @@ resource "kubernetes_deployment" "gits_media_service" {
           "dapr.io/http-port" = 3000
           "dapr.io/sidecar-cpu-request" = "100m"
           "dapr.io/sidecar-cpu-limit"   = "200m"
-          "dapr.io/sidecar-memory-request" = "100Mi"
-          "dapr.io/sidecar-memory-limit"   = "200Mi"
+          "dapr.io/sidecar-memory-request" = "150Mi"
+          "dapr.io/sidecar-memory-limit"   = "250Mi"
+          "dapr.io/env" = "GOMEMLIMIT=220MiB"
         }
       }
 
@@ -179,7 +180,7 @@ resource "helm_release" "minio" {
 
 resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_media_service_hpa" {
   metadata {
-    name = "gits-media-service-hpa"
+    name = kubernetes_deployment.gits_graphql_gateway.metadata[0].name
     namespace = kubernetes_namespace.gits.metadata[0].name
   }
 
@@ -188,8 +189,9 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_media_service_hpa" {
     max_replicas = 10
 
     scale_target_ref {
+      api_version = "apps/v1"
       kind = "Deployment"
-      name = "gits_media_service"
+      name = kubernetes_deployment.gits_graphql_gateway.metadata[0].name
     }
 
     metric {
