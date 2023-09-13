@@ -49,13 +49,9 @@ resource "kubernetes_deployment" "gits_course_service" {
           name = "gits-course-service"
 
           resources {
-            limits = {
-              cpu    = "0.5"
-              memory = "512Mi"
-            }
             requests = {
-              cpu    = "50m"
-              memory = "50Mi"
+              cpu    = "100m"
+              memory = "500Mi"
             }
           }
 
@@ -131,4 +127,33 @@ resource "helm_release" "course_service_db" {
     name  = "global.postgresql.auth.password"
     value = random_password.course_service_db_pass.result
   }
+}
+
+resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_course_service_hpa" {
+  metadata {
+    name = kubernetes_deployment.gits_course_service.metadata[0].name
+    namespace = kubernetes_namespace.gits.metadata[0].name
+  }
+
+  spec {
+    min_replicas = 1
+    max_replicas = 10
+
+    scale_target_ref {
+      api_version = "apps/v1"
+      kind = "Deployment"
+      name = kubernetes_deployment.gits_course_service.metadata[0].name
+    }
+
+    metric {
+      type = "Resource"
+      resource {
+        name = "cpu"
+        target {
+          type = "Utilization"
+          average_utilization = 300
+        }
+      }
+    }
+  }  
 }
