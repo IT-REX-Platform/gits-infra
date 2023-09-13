@@ -148,7 +148,7 @@ resource "helm_release" "user_service_db" {
 
 resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_user_service_hpa" {
   metadata {
-    name = kubernetes_deployment.gits_graphql_gateway.metadata[0].name
+    name = kubernetes_deployment.gits_user_service.metadata[0].name
     namespace = kubernetes_namespace.gits.metadata[0].name
   }
 
@@ -159,7 +159,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "gits_user_service_hpa" {
     scale_target_ref {
       api_version = "apps/v1"
       kind = "Deployment"
-      name = kubernetes_deployment.gits_graphql_gateway.metadata[0].name
+      name = kubernetes_deployment.gits_user_service.metadata[0].name
     }
 
     metric {
