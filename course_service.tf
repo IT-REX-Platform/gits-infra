@@ -32,6 +32,11 @@ resource "kubernetes_deployment" "gits_course_service" {
           "dapr.io/app-id"    = "course-service"
           "dapr.io/app-port"  = 2001
           "dapr.io/http-port" = 2000
+          "dapr.io/sidecar-cpu-request" = "100m"
+          "dapr.io/sidecar-cpu-limit"   = "200m"
+          "dapr.io/sidecar-memory-request" = "100Mi"
+          "dapr.io/sidecar-memory-limit"   = "200Mi"
+          "dapr.io/env" = "GOMEMLIMIT=180MiB"
         }
       }
 

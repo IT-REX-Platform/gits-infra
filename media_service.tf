@@ -34,9 +34,9 @@ resource "kubernetes_deployment" "gits_media_service" {
           "dapr.io/http-port" = 3000
           "dapr.io/sidecar-cpu-request" = "100m"
           "dapr.io/sidecar-cpu-limit"   = "200m"
-          "dapr.io/sidecar-memory-request" = "150Mi"
-          "dapr.io/sidecar-memory-limit"   = "250Mi"
-          "dapr.io/env" = "GOMEMLIMIT=220MiB"
+          "dapr.io/sidecar-memory-request" = "100Mi"
+          "dapr.io/sidecar-memory-limit"   = "200Mi"
+          "dapr.io/env" = "GOMEMLIMIT=180MiB"
         }
       }
 
