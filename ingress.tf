@@ -7,7 +7,6 @@ resource "kubernetes_ingress_v1" "gits" {
     annotations = {
       "kubernetes.io/ingress.class"                   = "nginx"
       "nginx.ingress.kubernetes.io/ssl-redirect"      = "true"
-      "cert-manager.io/cluster-issuer"                = "ca-issuer"
       "nginx.ingress.kubernetes.io/proxy-body-size"   = "10m"
       "nginx.ingress.kubernetes.io/proxy-buffer-size" = "10m"
     }
@@ -113,12 +112,6 @@ resource "kubernetes_ingress_v1" "gits" {
         }
       }
     }
-
-    tls {
-      secret_name = "orange-tls-cert"
-      hosts       = ["orange.informatik.uni-stuttgart.de"]
-    }
-
   }
 }
 
