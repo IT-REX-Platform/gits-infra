@@ -74,27 +74,27 @@ resource "kubernetes_deployment" "gits_flashcard_service" {
             value = random_password.flashcard_service_db_pass.result
           }
 
-          # liveness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 4001
+           liveness_probe {
+             http_get {
+               path = "/graphql"
+               port = 6001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
 
-          # readiness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 4001
+           readiness_probe {
+             http_get {
+               path = "/graphql"
+               port = 6001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
         }
       }
     }

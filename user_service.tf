@@ -83,27 +83,27 @@ resource "kubernetes_deployment" "gits_user_service" {
             name  = "KEYCLOAK_PASSWORD"
             value = var.keycloak_admin_pw
           }
-          # liveness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 5001
+           liveness_probe {
+             http_get {
+               path = "/graphql"
+               port = 5001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
 
-          # readiness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 5001
+           readiness_probe {
+             http_get {
+               path = "/graphql"
+               port = 5001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
         }
       }
     }

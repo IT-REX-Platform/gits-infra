@@ -75,27 +75,27 @@ resource "kubernetes_deployment" "gits_course_service" {
             value = random_password.course_service_db_pass.result
           }
 
-          # liveness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 2001
+           liveness_probe {
+             http_get {
+               path = "/graphql"
+               port = 2001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
 
-          # readiness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 2001
+           readiness_probe {
+             http_get {
+               path = "/graphql"
+               port = 2001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
         }
       }
     }

@@ -85,27 +85,27 @@ resource "kubernetes_deployment" "gits_quiz_service" {
           }
 
 
-          # liveness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 7001
+           liveness_probe {
+             http_get {
+               path = "/graphql"
+               port = 9001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
 
-          # readiness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 7001
+           readiness_probe {
+             http_get {
+               path = "/graphql"
+               port = 9001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
         }
       }
     }

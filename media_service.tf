@@ -88,27 +88,27 @@ resource "kubernetes_deployment" "gits_media_service" {
             value = random_password.media_service_minio_pass.result
           }
 
-          # liveness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 3001
+           liveness_probe {
+             http_get {
+               path = "/graphql"
+               port = 3001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
 
-          # readiness_probe {
-          #   http_get {
-          #     path = "/graphql"
-          #     port = 3001
+           readiness_probe {
+             http_get {
+               path = "/graphql"
+               port = 3001
 
-          #   }
+             }
 
-          #   initial_delay_seconds = 30
-          #   period_seconds        = 9
-          # }
+             initial_delay_seconds = 30
+             period_seconds        = 9
+           }
         }
       }
     }
