@@ -87,7 +87,7 @@ resource "kubernetes_deployment" "gits_reward_service" {
 
            liveness_probe {
              http_get {
-               path = "/graphql"
+               path = "/actuator/health/liveness"
                port = 7001
 
              }
@@ -98,7 +98,7 @@ resource "kubernetes_deployment" "gits_reward_service" {
 
            readiness_probe {
              http_get {
-               path = "/graphql"
+               path = "/actuator/health/readiness"
                port = 7001
 
              }
